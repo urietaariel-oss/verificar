@@ -52,30 +52,48 @@
   <footer>Cualquier modificación del archivo, por mínima que sea, cambia su huella digital (SHA-256) y hace que la verificación falle.</footer>
 </main>
 <script>
-const REG = [{"codigo": "INF-2026-001", "titulo": "Informe verificado_-_Residencia Ricardo Martinelli_-_Soná", "fecha": "2026-10-18", "sha256": "329227903a308b5910dbbf31c8ec59fc21e03a89c78b4be82512bc07d856036b"}];
+let REG = null;
 const codigo = new URLSearchParams(location.search).get("codigo");
 const info = document.getElementById("info");
 const res = document.getElementById("res");
+const esc = t => String(t).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-if (codigo) {
+async function cargar() {
+  if (REG) return REG;
+  const r = await fetch("registros.json?t=" + Date.now(), { cache: "no-store" });
+  if (!r.ok) throw new Error("HTTP " + r.status);
+  REG = await r.json();
+  return REG;
+}
+
+cargar().then(() => {
+  if (!codigo) return;
   const r = REG.find(x => x.codigo === codigo);
   info.hidden = false;
   info.innerHTML = r
-    ? `<dl><dt>Código</dt><dd><b>${r.codigo}</b></dd><dt>Título</dt><dd>${r.titulo}</dd><dt>Emitido</dt><dd>${r.fecha}</dd></dl>`
-    : `<b>El código ${codigo.replace(/[<>&]/g,"")} no está registrado.</b> Desconfíe de este documento.`;
-}
+    ? `<dl><dt>Código</dt><dd><b>${esc(r.codigo)}</b></dd><dt>Título</dt><dd>${esc(r.titulo)}</dd><dt>Emitido</dt><dd>${esc(r.fecha)}</dd></dl>`
+    : `<b>El código ${esc(codigo)} no está registrado.</b> Desconfíe de este documento.`;
+}).catch(() => {
+  info.hidden = false;
+  info.innerHTML = "<b>No se pudo cargar el registro.</b> Revise su conexión y recargue la página.";
+});
 
 async function verificar(file) {
   const buf = await file.arrayBuffer();
   const dig = await crypto.subtle.digest("SHA-256", buf);
   const hex = [...new Uint8Array(dig)].map(b => b.toString(16).padStart(2, "0")).join("");
+  try { await cargar(); } catch (e) {
+    res.className = "res bad";
+    res.innerHTML = "<strong>No se pudo cargar el registro</strong><p>Revise su conexión y vuelva a intentarlo.</p>";
+    return;
+  }
   const r = REG.find(x => x.sha256 === hex);
   if (r && (!codigo || r.codigo === codigo)) {
     res.className = "res ok";
-    res.innerHTML = `<strong>✔ Documento auténtico</strong><p>Es idéntico al informe <b>${r.codigo}</b> — ${r.titulo} (${r.fecha}).</p>`;
+    res.innerHTML = `<strong>✔ Documento auténtico</strong><p>Es idéntico al informe <b>${esc(r.codigo)}</b> — ${esc(r.titulo)} (${esc(r.fecha)}).</p>`;
   } else if (r) {
     res.className = "res bad";
-    res.innerHTML = `<strong>✘ No corresponde a este código</strong><p>El archivo es el informe ${r.codigo}, no ${codigo}.</p>`;
+    res.innerHTML = `<strong>✘ No corresponde a este código</strong><p>El archivo es el informe ${esc(r.codigo)}, no ${esc(codigo)}.</p>`;
   } else {
     res.className = "res bad";
     res.innerHTML = `<strong>✘ No coincide con ningún informe registrado</strong><p>El archivo fue modificado o no es la versión oficial.</p><code>${hex}</code>`;
