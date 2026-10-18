@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verificación de informes</title>
+<style>
+  :root { --bg:#f5f6f8; --card:#fff; --ink:#1c2430; --muted:#5d6878; --accent:#1F3A5F;
+          --ok:#1d7a46; --okbg:#e7f5ed; --bad:#b3261e; --badbg:#fbeaea; --line:#d9dee5; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#12161c; --card:#1b212a; --ink:#e7ebf0; --muted:#9aa5b4; --accent:#8fb3e0;
+            --ok:#6fd39a; --okbg:#173325; --bad:#ff8a80; --badbg:#3a1c1c; --line:#2c3440; }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+         font:16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width:620px; margin:0 auto; padding:40px 16px; }
+  h1 { font-size:1.5rem; margin:0 0 4px; color:var(--accent); }
+  .sub { color:var(--muted); margin:0 0 28px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:22px; margin-bottom:16px; }
+  label.drop { display:block; border:2px dashed var(--line); border-radius:10px; padding:34px 16px;
+               text-align:center; cursor:pointer; color:var(--muted); transition:.15s; }
+  label.drop:hover, label.drop.over { border-color:var(--accent); color:var(--ink); }
+  input[type=file] { display:none; }
+  .res { border-radius:10px; padding:16px 18px; margin-top:16px; display:none; }
+  .res.ok { display:block; background:var(--okbg); color:var(--ok); }
+  .res.bad { display:block; background:var(--badbg); color:var(--bad); }
+  .res strong { display:block; font-size:1.1rem; margin-bottom:4px; }
+  .res p { margin:2px 0; color:var(--ink); }
+  code { font:12px/1.4 ui-monospace, Consolas, monospace; word-break:break-all; color:var(--muted); }
+  dl { display:grid; grid-template-columns:max-content 1fr; gap:6px 14px; margin:0; }
+  dt { color:var(--muted); } dd { margin:0; }
+  footer { color:var(--muted); font-size:.85rem; text-align:center; margin-top:28px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Verificación de informes técnicos</h1>
+  <p class="sub">Ariel Urieta</p>
+
+  <div class="card" id="info" hidden></div>
+
+  <div class="card">
+    <label class="drop" id="drop">
+      <input type="file" id="file" accept="application/pdf">
+      <div><b>Seleccione o arrastre aquí el PDF que recibió</b></div>
+      <div style="font-size:.9rem;margin-top:6px">El archivo no se sube a ningún servidor: se analiza en su propio navegador.</div>
+    </label>
+    <div class="res" id="res"></div>
+  </div>
+
+  <footer>Cualquier modificación del archivo, por mínima que sea, cambia su huella digital (SHA-256) y hace que la verificación falle.</footer>
+</main>
+<script>
+const REG = [];
+const codigo = new URLSearchParams(location.search).get("codigo");
+const info = document.getElementById("info");
+const res = document.getElementById("res");
+
+if (codigo) {
+  const r = REG.find(x => x.codigo === codigo);
+  info.hidden = false;
+  info.innerHTML = r
+    ? `<dl><dt>Código</dt><dd><b>${r.codigo}</b></dd><dt>Título</dt><dd>${r.titulo}</dd><dt>Emitido</dt><dd>${r.fecha}</dd></dl>`
+    : `<b>El código ${codigo.replace(/[<>&]/g,"")} no está registrado.</b> Desconfíe de este documento.`;
+}
+
+async function verificar(file) {
+  const buf = await file.arrayBuffer();
+  const dig = await crypto.subtle.digest("SHA-256", buf);
+  const hex = [...new Uint8Array(dig)].map(b => b.toString(16).padStart(2, "0")).join("");
+  const r = REG.find(x => x.sha256 === hex);
+  if (r && (!codigo || r.codigo === codigo)) {
+    res.className = "res ok";
+    res.innerHTML = `<strong>✔ Documento auténtico</strong><p>Es idéntico al informe <b>${r.codigo}</b> — ${r.titulo} (${r.fecha}).</p>`;
+  } else if (r) {
+    res.className = "res bad";
+    res.innerHTML = `<strong>✘ No corresponde a este código</strong><p>El archivo es el informe ${r.codigo}, no ${codigo}.</p>`;
+  } else {
+    res.className = "res bad";
+    res.innerHTML = `<strong>✘ No coincide con ningún informe registrado</strong><p>El archivo fue modificado o no es la versión oficial.</p><code>${hex}</code>`;
+  }
+}
+
+const inp = document.getElementById("file"), drop = document.getElementById("drop");
+inp.addEventListener("change", e => e.target.files[0] && verificar(e.target.files[0]));
+["dragover","dragenter"].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add("over"); }));
+["dragleave","drop"].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop", e => e.dataTransfer.files[0] && verificar(e.dataTransfer.files[0]));
+</script>
+</body>
+</html>
