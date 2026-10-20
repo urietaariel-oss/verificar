@@ -10,5 +10,11 @@
   "titulo": "Informe verificado_-_Supermercado Luis_-_Ocú",
   "fecha": "2026-10-18",
   "sha256": "03f1ac966b8b5fc2e7fa8fef8afb585ea721b70529748308a819c4acdb1d7922"
+ },
+ {
+  "codigo": "INF-2026-003",
+  "titulo": "Informe_Supermercado 99_-_Santiago",
+  "fecha": "2026-10-19",
+  "sha256": "c41d516fadda28fb9942e6e9640361b48d673da5b7ef40ae3b2261d5c4e3b981"
  }
 ]
