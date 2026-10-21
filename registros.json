@@ -16,5 +16,11 @@
   "titulo": "Informe_Supermercado 99_-_Santiago",
   "fecha": "2026-10-19",
   "sha256": "c90675443c240e17c57956d881783c05ddf75112ae58bc4ff6144e483786fdc4"
+ },
+ {
+  "codigo": "INF-2026-004",
+  "titulo": "Informe_Supermercado 99_-_SONA",
+  "fecha": "2026-10-21",
+  "sha256": "0a8e9de7da2a4f340f28511304984c08a0fdee215bc37d36f9e60403d2636295"
  }
 ]
