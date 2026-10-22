@@ -22,5 +22,11 @@
   "titulo": "Informe_Supermercado 99_-_SONA",
   "fecha": "2026-10-21",
   "sha256": "0a8e9de7da2a4f340f28511304984c08a0fdee215bc37d36f9e60403d2636295"
+ },
+ {
+  "codigo": "INF-2026-005",
+  "titulo": "Informe_Supermercado 99_-_AGUADULCE",
+  "fecha": "2026-10-22",
+  "sha256": "d76c61e85c62fe32e81f87c2fe74dfb0fb6ad38a6c8ddb44f6e93662c15c29a9"
  }
 ]
