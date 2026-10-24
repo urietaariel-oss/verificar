@@ -34,5 +34,11 @@
   "titulo": "Informe_Supermercado 99_-_CHITRÉ",
   "fecha": "2026-10-23",
   "sha256": "17b23c633530ef2d4d36c051efb318e929f0789e3fcfd9365dcbd9e17c94c0a3"
+ },
+ {
+  "codigo": "INF-2026-007",
+  "titulo": "Informe_-_Plaza Peña Díaz_-_Santiago",
+  "fecha": "2026-10-24",
+  "sha256": "bf533b1497c83712c786853f25ef2b7cbabd224acdd952c99426c9f1b7d21162"
  }
 ]
