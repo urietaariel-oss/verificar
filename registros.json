@@ -40,5 +40,11 @@
   "titulo": "Informe_-_Plaza Peña Díaz_-_Santiago",
   "fecha": "2026-10-24",
   "sha256": "bf533b1497c83712c786853f25ef2b7cbabd224acdd952c99426c9f1b7d21162"
+ },
+ {
+  "codigo": "INF-2026-008",
+  "titulo": "Informe_-_Benis Bolivar González_-_Montijo",
+  "fecha": "2026-10-27",
+  "sha256": "42cc46de037fb4992dfed748f4dcd5ea7b6210eff7a2fdc86e10b62c23abf9d4"
  }
 ]
